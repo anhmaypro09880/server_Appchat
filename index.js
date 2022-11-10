@@ -46,10 +46,37 @@ io.on("connection", (socket) => {
         // console.log("online: "+onlineUsers);
         // console.log(onlineUsers);
     });
+    socket.on("deleted-msg", (data) => {
+        const sendUserSocket = onlineUsers.get(data.to);
+        if (sendUserSocket) {
+            socket.to(sendUserSocket).emit("msg-deleted", {
+                id: data.id,
+                to: data.to,
+                from: data.from,
+                deletedFromSelf: data.deletedFromSelf,
+                deletedToAll: data.deletedToAll,
+            });
+        }
+        if (data.to.length > 2) {
+            for (let i = 0; i < data.to.length; i++) {
+                const sendUserSocket = onlineUsers.get(data.to[i]);
 
+                if (sendUserSocket) {
+                    socket.to(sendUserSocket).emit("msg-deleted", {
+                        id: data.id,
+                        to: data.to,
+                        from: data.from,
+                        deletedFromSelf: data.deletedFromSelf,
+                        deletedToAll: data.deletedToAll,
+                    });
+                }
+            }
+        }
+    });
     socket.on("send-msg", (data) => {
         const sendUserSocket = onlineUsers.get(data.to);
         // console.log("Sender socket " + sendUserSocket);
+
         if (sendUserSocket) {
             socket.to(sendUserSocket).emit("msg-recieve", {
                 id: data.id,
@@ -59,6 +86,8 @@ io.on("connection", (socket) => {
                 avatarImage: data.avatarImage,
                 files: data.files,
                 image: data.image,
+                deleteFromSelf: data.deleteFromSelf,
+                deleteToAll: data.deleteToAll,
             });
         }
 

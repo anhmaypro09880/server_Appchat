@@ -192,7 +192,7 @@ module.exports.imageMessageSend = (req, res, next) => {
                 },
                 avatarImage: avatarImageOut,
             });
-            res.status(200).json({ data: imagesArray });
+            res.status(200).json({ data: insertMessage });
         }
     });
 };
@@ -231,7 +231,7 @@ module.exports.fileMessageSend = (req, res, next) => {
                 },
                 avatarImage: avatarImageOut,
             });
-            res.status(200).json({ data: imagesArray });
+            res.status(200).json({ data: insertMessage });
         }
     });
 };
@@ -239,20 +239,20 @@ module.exports.fileMessageSend = (req, res, next) => {
 // Handle Delete Message FromSelft
 module.exports.deleteMessageFromSelf = async (req, res, next) => {
     console.log("Connect to Delete Message fromSelf");
-    const { from, to, deleteToAll, deleteFromSelf } = req.body;
+    const { from, to, deletedToAll, deletedFromSelf } = req.body;
+
     const filter = { _id: from };
-    const update = { deleted: { fromSelf: true, toAll: deleteToAll } };
+    const update = { deleted: { fromSelf: true, toAll: deletedToAll } };
     const data = await Messages.findOneAndUpdate(filter, update, { new: true });
-    res.status(200).json({ data: data.deleted });
+    res.status(200).json({ data: data });
 };
 
 module.exports.deleteMessageToAll = async (req, res, next) => {
     console.log("Connect to Delete Message To All");
-    const { from, to, deleteFromSelf, deleteToAll } = req.body;
+    const { from, to, deletedFromSelf, deletedToAll } = req.body;
     const filter = { _id: from };
     const update = {
-        deleted: { fromSelf: deleteFromSelf, toAll: true },
-        message: { text: "Tin nhắn đã bị thu hồi" },
+        deleted: { fromSelf: deletedFromSelf, toAll: true },
     };
     const data = await Messages.findOneAndUpdate(filter, update, { new: true });
 
